@@ -36,18 +36,11 @@ function CreateTrip() {
   const navigate = useNavigate();
   const toast = useToast();
 
-  // Automatically open dialog if user is not signed up
-  // useEffect(() => {
-  //   if (!signedUp) {
-  //     setOpenDialogue(false);
-  //   }
-  // }, [signedUp]);
 
   const signIn = useGoogleLogin({
     onSuccess: (tokenResponse) => getUserInfo(tokenResponse),
     onError: (error) => console.log(error),
     flow: "implicit", // Make sure this is correct for your setup
-    // redirect_uri: "https://sikarwalstripplanner.vercel.app/", // Ensure this matches your Google Console config
   });
   
 
