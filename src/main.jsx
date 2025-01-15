@@ -7,7 +7,7 @@ import { RouterProvider } from "react-router";
 import "./index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ViewTrip from "./viewTrip/Viewtrip.jsx";
-import Mytrips from "./mytrips/mytrips.jsx";
+import Mytrips from "./mytrips/Mytrips.jsx";
 import { Toaster } from "./components/ui/toaster.jsx";
 import Footer from "./components/ui/custom/Footer.jsx";
 
