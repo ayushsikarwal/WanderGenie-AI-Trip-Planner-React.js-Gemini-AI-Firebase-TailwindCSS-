@@ -22,6 +22,7 @@ import { db } from "../services/firebaseConfig.jsx";
 import { VscLoading } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/ui/custom/Header.jsx";
+import { use } from "react";
 
 function CreateTrip() {
   const [place, setPlace] = useState();
@@ -29,20 +30,20 @@ function CreateTrip() {
   const [border, setBorder] = useState({ badges: "", plan: "" });
   const [openDialogue, setOpenDialogue] = useState(false);
   const [loading, setLoading] = useState(false);
-  const[signedUp, setSignedUp]= useState(
+  const [numberOfMembers, setNumberOfMembers] = useState(null);
+  const [emails, setEmails] = useState([]);
+  const [signedUp, setSignedUp] = useState(
     localStorage.getItem("user") ? true : false
-  )
+  );
 
   const navigate = useNavigate();
   const toast = useToast();
-
 
   const signIn = useGoogleLogin({
     onSuccess: (tokenResponse) => getUserInfo(tokenResponse),
     onError: (error) => console.log(error),
     flow: "implicit", // Make sure this is correct for your setup
   });
-  
 
   const getUserInfo = (tokenResponse) => {
     axios
@@ -60,6 +61,7 @@ function CreateTrip() {
         setOpenDialogue(false);
         toast.success("Signed up successfully!");
         setSignedUp(true); // Update the signed-up state
+        onSubmitFunc()
       })
       .catch((error) => {
         console.error(error);
@@ -78,25 +80,31 @@ function CreateTrip() {
       return;
     }
 
-    const user = localStorage.getItem('user')
+    const user = localStorage.getItem("user");
 
-    if(!user){
-      setOpenDialogue(true)
+    // if (!user) {
+    //   setOpenDialogue(true);
+    // }
+    if(user){
+      const AI_PROMPT = `Generate travel plan for : ${formData.location.label}, for ${formData.noOfDays} for ${formData.typeOftrip} with rupees ${formData.budget} budget per person, give me a hotel option list with HotelName, Hotel address, Price, Hotel url, geo coordinates, rating, description and suggest itinerary with placeName, Place details, Place image url, geo coordinates , ticket pricing, rating, time travel each of the location for ${formData.noOfDays} with each day plan with best time to visit in JSON format. Please provide me the URLs of images that are working.`;
+
+      try {
+        setLoading(true);
+        const result = await chatSession.sendMessage(AI_PROMPT);
+        await saveTripDetail(result.response.candidates[0].content.parts[0].text);
+        axios.post('http://localhost:5001/send-mail' , {user : user.name, invitedMembers: emails, formData: formData})
+        setSignedUp(true);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to generate trip plan. Try again.");
+      } finally {
+        setLoading(false);
+      }
+    }else{
+      setOpenDialogue(true);
     }
 
-    const AI_PROMPT = `Generate travel plan for : ${formData.location.label}, for ${formData.noOfDays} for ${formData.typeOftrip} with a ${formData.budget} budget, give me a hotel option list with HotelName, Hotel address, Price, Hotel url, geo coordinates, rating, description and suggest itinerary with placeName, Place details, Place image url, geo coordinates , ticket pricing, rating, time travel each of the location for ${formData.noOfDays} with each day plan with best time to visit in JSON format. Please provide me the URLs of images that are working.`;
-
-    try {
-      setLoading(true)
-      const result = await chatSession.sendMessage(AI_PROMPT);
-      await saveTripDetail(result.response.candidates[0].content.parts[0].text);
-      setSignedUp(true);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to generate trip plan. Try again.");
-    } finally {
-      setLoading(false);
-    }
+    
   };
 
   const saveTripDetail = async (tripDetail) => {
@@ -123,7 +131,7 @@ function CreateTrip() {
         border.badges === item.type ? "border-black" : ""
       }`}
       onClick={() => {
-        handleInputChange("budget", item.type);
+        handleInputChange("typeOfBudget", item.type);
         setBorder((border) => ({ ...border, badges: item.type }));
       }}
     >
@@ -156,6 +164,21 @@ function CreateTrip() {
     </div>
   ));
 
+  const handleMemberChange = (e) => {
+    const num = parseInt(e.target.value, 10) || 0;
+    setNumberOfMembers(num);
+
+    // Adjust the email array to match the number of members
+    const updatedEmails = Array.from({ length: num }, (_, i) => emails[i] || "");
+    setEmails(updatedEmails);
+  };
+
+  const handleEmailChange = (index, value) => {
+    const updatedEmails = [...emails];
+    updatedEmails[index] = value;
+    setEmails(updatedEmails);
+  };
+
   useEffect(() => {
     console.log(formData);
   }, [formData]);
@@ -174,7 +197,18 @@ function CreateTrip() {
 
         <div className="border rounded-lg shadow-md p-4 sm:p-5 space-y-6">
           <div className="space-y-2">
-            <h2 className="text-lg font-medium">What is the choice of Destination?</h2>
+            <h2 className="text-lg font-medium">Name of your trip</h2>
+            <input
+              className="w-full border rounded-lg p-3 text-base"
+              type="text"
+              placeholder=" Ex: Goa is onnnnn !!!!!!"
+              onChange={(e) => handleInputChange("tripName", e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-lg font-medium">
+              What is the choice of Destination?
+            </h2>
             <div className="w-full">
               <GooglePlacesAutocomplete
                 apiKey={import.meta.env.VITE_GOOGLE_PLACES_API_KEY}
@@ -187,9 +221,9 @@ function CreateTrip() {
                   styles: {
                     control: (provided) => ({
                       ...provided,
-                      minHeight: '44px',
-                    })
-                  }
+                      minHeight: "44px",
+                    }),
+                  },
                 }}
               />
             </div>
@@ -208,19 +242,81 @@ function CreateTrip() {
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-lg font-medium">What is your budget?</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">{badges}</div>
+            <h2 className="text-lg font-medium">Type of your budget?</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {badges}
+            </div>
+            <div disabled={true}>
+              <h2 className="text-lg font-medium">
+                Approximate budget per person in Rupees*
+              </h2>
+              <input
+                className="w-full border rounded-lg p-3 text-base"
+                type="number"
+                placeholder="Ex: 6000"
+                onChange={(e) => handleInputChange("budget", e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-lg font-medium">Who do you plan on traveling with?</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">{plan}</div>
+            <h2 className="text-lg font-medium">
+              Who do you plan on traveling with?
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {plan}
+            </div>
           </div>
+
+          <div className="space-y-2">
+            <h2 className="text-lg font-medium">Describle your interest</h2>
+            <input
+              className="w-full border rounded-lg p-3 text-base"
+              type="text"
+              placeholder=" Ex: I want a trip with full of adventure with my homies"
+              onChange={(e) => handleInputChange("description", e.target.value)}
+            />
+          </div>
+          {formData.typeOftrip == "Family" ? (
+            <div>
+            <h2 className="text-lg font-extrabold">Invite Members</h2>
+            <div className="flex px-3">
+              <h2 className="text-lg font-medium">Number of members</h2>
+              <input
+                className="w-full border rounded-lg p-3 text-base"
+                type="number"
+                value={numberOfMembers}
+                onChange={handleMemberChange}
+                min="0"
+              />
+            </div>
+      
+            {numberOfMembers > 0 && (
+              <div>
+                <h3 className="text-lg font-bold mt-4">Enter Emails for Members</h3>
+                {Array.from({ length: numberOfMembers }).map((_, index) => (
+                  <div key={index} className="flex items-center mt-2">
+                    <label className="mr-2">Member {index + 1}:</label>
+                    <input
+                      className="border rounded-lg p-2 flex-1"
+                      type="email"
+                      placeholder={`Enter email for Member ${index + 1}`}
+                      value={emails[index] || ""}
+                      onChange={(e) => handleEmailChange(index, e.target.value)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          ) : (
+            <></>
+          )}
         </div>
 
         <div className="flex justify-end pt-4">
-          <Button 
-            disabled={loading} 
+          <Button
+            disabled={loading || (formData.typeOftrip=='Family' && numberOfMembers<=2)}
             onClick={onSubmitFunc}
             className="w-full sm:w-auto px-6 py-2"
           >
@@ -235,7 +331,9 @@ function CreateTrip() {
         <Dialog open={openDialogue}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold">Sign up to proceed</DialogTitle>
+              <DialogTitle className="text-xl font-semibold">
+                Sign up to proceed
+              </DialogTitle>
               <DialogDescription className="space-y-4">
                 <h2 className="text-base">Please sign up to continue</h2>
                 <Button

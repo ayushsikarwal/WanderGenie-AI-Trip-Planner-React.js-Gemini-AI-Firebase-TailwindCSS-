@@ -20,13 +20,13 @@ const SelectTravelsList=[
         icon: '👪',
         people: '3 to 5 people'
     },
-    {
-        id:3,
-        title:'Friend',
-        desc:'A bunch of thrill-seekers',
-        icon: '👥',
-        people: '5+ people'
-    }
+    // {
+    //     id:3,
+    //     title:'Friend',
+    //     desc:'A bunch of thrill-seekers',
+    //     icon: '👥',
+    //     people: '5+ people'
+    // }
 ]
 
 export default SelectTravelsList

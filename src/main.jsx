@@ -37,7 +37,7 @@ function Root() {
     <StrictMode>
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_AUTHETICATION_ID}>
         <RouterProvider router={routes} />
-        <Footer/>
+        {/* <Footer/> */}
       </GoogleOAuthProvider>
     </StrictMode>
   );
