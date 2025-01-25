@@ -32,6 +32,7 @@ function CreateTrip() {
   const [loading, setLoading] = useState(false);
   const [numberOfMembers, setNumberOfMembers] = useState(null);
   const [emails, setEmails] = useState([]);
+  const [names, setNames] = useState([]);
   const [signedUp, setSignedUp] = useState(
     localStorage.getItem("user") ? true : false
   );
@@ -61,7 +62,7 @@ function CreateTrip() {
         setOpenDialogue(false);
         toast.success("Signed up successfully!");
         setSignedUp(true); // Update the signed-up state
-        onSubmitFunc()
+        onSubmitFunc();
       })
       .catch((error) => {
         console.error(error);
@@ -85,13 +86,16 @@ function CreateTrip() {
     // if (!user) {
     //   setOpenDialogue(true);
     // }
-    if(user){
+    if (user) {
       const AI_PROMPT = `Generate travel plan for : ${formData.location.label}, for ${formData.noOfDays} for ${formData.typeOftrip} with rupees ${formData.budget} budget per person, give me a hotel option list with HotelName, Hotel address, Price, Hotel url, geo coordinates, rating, description and suggest itinerary with placeName, Place details, Place image url, geo coordinates , ticket pricing, rating, time travel each of the location for ${formData.noOfDays} with each day plan with best time to visit in JSON format. Please provide me the URLs of images that are working.`;
 
       try {
         setLoading(true);
         const result = await chatSession.sendMessage(AI_PROMPT);
-        await saveTripDetail(result.response.candidates[0].content.parts[0].text, user);
+        await saveTripDetail(
+          result.response.candidates[0].content.parts[0].text,
+          user
+        );
         // axios.post('http://localhost:5001/send-mail' , {user : user.name, invitedMembers: emails, formData: formData})
         setSignedUp(true);
       } catch (error) {
@@ -100,11 +104,9 @@ function CreateTrip() {
       } finally {
         setLoading(false);
       }
-    }else{
+    } else {
       setOpenDialogue(true);
     }
-
-    
   };
 
   const saveTripDetail = async (tripDetail, user) => {
@@ -113,9 +115,16 @@ function CreateTrip() {
       tripChoices: formData,
       tripData: JSON.parse(tripDetail),
       user: JSON.parse(localStorage.getItem("user")),
+      invitedUsersName : names,
+      invitedUsersEmail : emails
     });
     navigate(`/view-trip/${docId}`);
-    axios.post('http://localhost:5001/send-mail' , {user : user.name, invitedMembers: emails, formData: formData, tripId : docId})
+    axios.post("http://localhost:5001/send-mail", {
+      user: user.name,
+      invitedMembers: emails,
+      formData: formData,
+      tripId: docId,
+    });
   };
 
   const handleInputChange = (name, value) => {
@@ -170,7 +179,10 @@ function CreateTrip() {
     setNumberOfMembers(num);
 
     // Adjust the email array to match the number of members
-    const updatedEmails = Array.from({ length: num }, (_, i) => emails[i] || "");
+    const updatedEmails = Array.from(
+      { length: num },
+      (_, i) => emails[i] || ""
+    );
     setEmails(updatedEmails);
   };
 
@@ -178,6 +190,12 @@ function CreateTrip() {
     const updatedEmails = [...emails];
     updatedEmails[index] = value;
     setEmails(updatedEmails);
+  };
+
+  const handleNameChange = (index, value) => {
+    const updatedNames = [...names];
+    updatedNames[index] = value;
+    setNames(updatedNames);
   };
 
   useEffect(() => {
@@ -280,36 +298,51 @@ function CreateTrip() {
           </div>
           {formData.typeOftrip == "Family" ? (
             <div>
-            <h2 className="text-lg font-extrabold">Invite Members</h2>
-            <div className="flex px-3">
-              <h2 className="text-lg font-medium">Number of members</h2>
-              <input
-                className="w-full border rounded-lg p-3 text-base"
-                type="number"
-                value={numberOfMembers}
-                onChange={handleMemberChange}
-                min="0"
-              />
-            </div>
-      
-            {numberOfMembers > 0 && (
-              <div>
-                <h3 className="text-lg font-bold mt-4">Enter Emails for Members</h3>
-                {Array.from({ length: numberOfMembers }).map((_, index) => (
-                  <div key={index} className="flex items-center mt-2">
-                    <label className="mr-2">Member {index + 1}:</label>
-                    <input
-                      className="border rounded-lg p-2 flex-1"
-                      type="email"
-                      placeholder={`Enter email for Member ${index + 1}`}
-                      value={emails[index] || ""}
-                      onChange={(e) => handleEmailChange(index, e.target.value)}
-                    />
-                  </div>
-                ))}
+              <h2 className="text-lg font-extrabold">Invite Members</h2>
+              <div className="flex px-3">
+                <h2 className="text-lg font-medium">Number of members</h2>
+                <input
+                  className="w-full border rounded-lg p-3 text-base"
+                  type="number"
+                  value={numberOfMembers}
+                  onChange={handleMemberChange}
+                  min="0"
+                />
               </div>
-            )}
-          </div>
+
+              {numberOfMembers > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold mt-4">
+                    Enter Emails for Members
+                  </h3>
+                  {Array.from({ length: numberOfMembers }).map((_, index) => (
+                    <div key={index} className="flex items-center mt-2">
+                      <label className="mr-2">Member {index + 1}:</label>
+                      <div className="mx-3 mt-2">
+                        <input
+                          className="border rounded-lg p-2 flex-1 mx-2 w-[500px]"
+                          type="userName"
+                          placeholder={`Enter name for Member ${index + 1}`}
+                          value={names[index] || ""}
+                          onChange={(e) =>
+                            handleNameChange(index, e.target.value)
+                          }
+                        />
+                        <input
+                          className="border rounded-lg p-2 flex-1 mx-2 w-[500px]"
+                          type="email"
+                          placeholder={`Enter email for Member ${index + 1}`}
+                          value={emails[index] || ""}
+                          onChange={(e) =>
+                            handleEmailChange(index, e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             <></>
           )}
@@ -317,7 +350,10 @@ function CreateTrip() {
 
         <div className="flex justify-end pt-4">
           <Button
-            disabled={loading || (formData.typeOftrip=='Family' && numberOfMembers<=2)}
+            disabled={
+              loading ||
+              (formData.typeOftrip == "Family" && numberOfMembers <= 2)
+            }
             onClick={onSubmitFunc}
             className="w-full sm:w-auto px-6 py-2"
           >
