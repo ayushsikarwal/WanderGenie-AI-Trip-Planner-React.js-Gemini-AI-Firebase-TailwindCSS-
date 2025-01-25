@@ -23,6 +23,8 @@ import { VscLoading } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/ui/custom/Header.jsx";
 import { use } from "react";
+import dayjs from 'dayjs';
+import DatePickerValue from "@/components/DatePickerValue.jsx";
 
 function CreateTrip() {
   const [place, setPlace] = useState();
@@ -33,9 +35,17 @@ function CreateTrip() {
   const [numberOfMembers, setNumberOfMembers] = useState(null);
   const [emails, setEmails] = useState([]);
   const [names, setNames] = useState([]);
+  const [inDate, setInDate] = useState(dayjs(Date.now()))
+  const [outDate, setOutDate] = useState(dayjs(Date.now()))
   const [signedUp, setSignedUp] = useState(
     localStorage.getItem("user") ? true : false
   );
+
+  const millisecondsInOneDay = 24 * 60 * 60 * 1000;
+  useEffect(()=>{
+    console.log(dayjs(inDate).format('DD-MM-YYYY')+ "----" + dayjs(outDate)+"------"+ Math.floor(outDate.diff(inDate)/millisecondsInOneDay))
+    handleInputChange("noOfDays", Math.floor(outDate.diff(inDate)/millisecondsInOneDay))
+  }, [inDate, outDate])
 
   const navigate = useNavigate();
   const toast = useToast();
@@ -248,12 +258,18 @@ function CreateTrip() {
             </div>
           </div>
 
+          <div>
+              <DatePickerValue inDate={inDate} outDate={outDate} setInDate={setInDate} setOutDate={setOutDate}/>
+          </div>
+
           <div className="space-y-2">
             <h2 className="text-lg font-medium">
               How many days are you planning your trip for?
             </h2>
             <input
+            disabled
               className="w-full border rounded-lg p-3 text-base"
+              value={Math.floor(outDate.diff(inDate)/millisecondsInOneDay)}
               type="number"
               placeholder="Ex: 9"
               onChange={(e) => handleInputChange("noOfDays", e.target.value)}
