@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "/src/components/ui/button.jsx";
 import { GetPlaceDetails, Photo_Req } from "@/services/GlobalAPI";
+import { useNavigate } from "react-router-dom";
 
-const InfoSection = ({ trip }) => {
+const InfoSection = ({ trip, tripId }) => {
 
   const [photo, setPhoto] = useState()
 
-
+  const navigate = useNavigate()
   useEffect(() => {
       trip&&GetPlacePhoto();
   }, [trip]);
@@ -54,7 +55,7 @@ const InfoSection = ({ trip }) => {
           </h2>
         </div>
         <div>
-          <Button className="rounded"> 🛫 Share trip</Button>
+          <Button onClick ={()=>{navigate(`/chat-room/${tripId}`)}} className="rounded"> 🛫 Share trip</Button>
         </div>
       </div>
     </div>

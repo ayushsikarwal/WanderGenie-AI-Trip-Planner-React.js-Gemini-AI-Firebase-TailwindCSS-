@@ -91,8 +91,8 @@ function CreateTrip() {
       try {
         setLoading(true);
         const result = await chatSession.sendMessage(AI_PROMPT);
-        await saveTripDetail(result.response.candidates[0].content.parts[0].text);
-        axios.post('http://localhost:5001/send-mail' , {user : user.name, invitedMembers: emails, formData: formData})
+        await saveTripDetail(result.response.candidates[0].content.parts[0].text, user);
+        // axios.post('http://localhost:5001/send-mail' , {user : user.name, invitedMembers: emails, formData: formData})
         setSignedUp(true);
       } catch (error) {
         console.error(error);
@@ -107,7 +107,7 @@ function CreateTrip() {
     
   };
 
-  const saveTripDetail = async (tripDetail) => {
+  const saveTripDetail = async (tripDetail, user) => {
     const docId = Date.now().toString();
     await setDoc(doc(db, "AITrip", docId), {
       tripChoices: formData,
@@ -115,6 +115,7 @@ function CreateTrip() {
       user: JSON.parse(localStorage.getItem("user")),
     });
     navigate(`/view-trip/${docId}`);
+    axios.post('http://localhost:5001/send-mail' , {user : user.name, invitedMembers: emails, formData: formData, tripId : docId})
   };
 
   const handleInputChange = (name, value) => {

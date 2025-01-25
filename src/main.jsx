@@ -10,6 +10,7 @@ import ViewTrip from "./viewTrip/Viewtrip.jsx";
 import Mytrips from "./mytrips/Mytrips.jsx";
 import { Toaster } from "./components/ui/toaster.jsx";
 import Footer from "./components/ui/custom/Footer.jsx";
+import ChatRoom from "./chattingroom/ChatRoom.jsx";
 
 function Root() {
 
@@ -30,6 +31,10 @@ function Root() {
       path: "/my-trips",
       element: <Mytrips  />,
     },
+    {
+      path : "/chat-room/:tripId",
+      element: <ChatRoom  />
+    }
   ]);
   
 
