@@ -365,24 +365,6 @@ const handleSearch = async () => {
               </div>
             </div>
           </div>
-          {/* Chat History Section */}
-          {/* <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-            <span className="w-2 h-8 bg-teal-500 rounded-full mr-3"></span>
-            Chat History
-          </h2>
-          <div className="space-y-3 max-h-96 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            {data.chatHistory?.map((message, index) => (
-              <div
-                key={index}
-                className="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
-              >
-                {message}
-              </div>
-            ))}
-          </div>
-        </div> */}
-
           {/* Search Results */}
           {searchResults.length > 0 && (
             <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
