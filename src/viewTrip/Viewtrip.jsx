@@ -6,6 +6,7 @@ import InfoSection from "./components/InfoSection.jsx";
 import Hotes from "./components/Hotes.jsx";
 import PlacesToVisit from "./components/PlacesToVisit.jsx";
 import Header from "@/components/ui/custom/Header.jsx";
+import FloatingNavBar from "@/components/ui/custom/FloatingNavBar.jsx";
 
 
 
@@ -37,7 +38,7 @@ const ViewTrip = () => {
       <InfoSection trip={trip} tripId ={tripId}/>
       <Hotes trip={trip}/>
       <PlacesToVisit trip = {trip}/>
-
+      <FloatingNavBar/>
       <div>Trip ID: {tripId}</div>
     </div>
     </>

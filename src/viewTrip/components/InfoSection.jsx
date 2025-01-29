@@ -55,7 +55,8 @@ const InfoSection = ({ trip, tripId }) => {
           </h2>
         </div>
         <div>
-          <Button onClick ={()=>{navigate(`/chat-room/${tripId}`)}} className="rounded"> 🛫 Share trip</Button>
+          <Button onClick ={()=>{navigate(`/chat-room/${tripId}`)}} className="rounded"> 🛫 Chatting Area</Button>
+          <Button onClick ={()=>{navigate(`/budgeting-tool/${tripId}`)}} className="rounded"> 🛫 Budget Tracking trip</Button>
         </div>
       </div>
     </div>

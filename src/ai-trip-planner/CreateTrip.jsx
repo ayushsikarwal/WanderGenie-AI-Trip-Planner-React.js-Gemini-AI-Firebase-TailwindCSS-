@@ -23,7 +23,7 @@ import { VscLoading } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/ui/custom/Header.jsx";
 import { use } from "react";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import DatePickerValue from "@/components/DatePickerValue.jsx";
 
 function CreateTrip() {
@@ -35,17 +35,28 @@ function CreateTrip() {
   const [numberOfMembers, setNumberOfMembers] = useState(null);
   const [emails, setEmails] = useState([]);
   const [names, setNames] = useState([]);
-  const [inDate, setInDate] = useState(dayjs(Date.now()))
-  const [outDate, setOutDate] = useState(dayjs(Date.now()))
+  const [inDate, setInDate] = useState(dayjs(Date.now()));
+  const [outDate, setOutDate] = useState(dayjs(Date.now()));
   const [signedUp, setSignedUp] = useState(
     localStorage.getItem("user") ? true : false
   );
 
   const millisecondsInOneDay = 24 * 60 * 60 * 1000;
-  useEffect(()=>{
-    console.log(dayjs(inDate).format('DD-MM-YYYY')+ "----" + dayjs(outDate)+"------"+ Math.floor(outDate.diff(inDate)/millisecondsInOneDay))
-    handleInputChange("noOfDays", Math.floor(outDate.diff(inDate)/millisecondsInOneDay))
-  }, [inDate, outDate])
+  useEffect(() => {
+    console.log(
+      dayjs(inDate).format("DD-MM-YYYY") +
+        "----" +
+        dayjs(outDate) +
+        "------" +
+        Math.floor(outDate.diff(inDate) / millisecondsInOneDay)
+    );
+    handleInputChange(
+      "noOfDays",
+      Math.floor(outDate.diff(inDate) / millisecondsInOneDay)
+    );
+    handleInputChange("inDate", dayjs(inDate).format("DD-MM-YYYY"));
+    handleInputChange("outDate", dayjs(outDate).format("DD-MM-YYYY"));
+  }, [inDate, outDate]);
 
   const navigate = useNavigate();
   const toast = useToast();
@@ -95,13 +106,100 @@ function CreateTrip() {
 
     // if (!user) {
     //   setOpenDialogue(true);
-    // }
+    // }in
+    // •⁠  ⁠Type of Budget: ${formData.typeOfBudget}
     if (user) {
-      const AI_PROMPT = `Generate travel plan for : ${formData.location.label}, for ${formData.noOfDays} for ${formData.typeOftrip} with rupees ${formData.budget} budget per person, give me a hotel option list with HotelName, Hotel address, Price, Hotel url, geo coordinates, rating, description and suggest itinerary with placeName, Place details, Place image url, geo coordinates , ticket pricing, rating, time travel each of the location for ${formData.noOfDays} with each day plan with best time to visit in JSON format. Please provide me the URLs of images that are working.`;
+      // const AI_PROMPT = `Generate travel plan for : ${formData.location.label}, for ${formData.noOfDays} for ${formData.typeOftrip} with rupees ${formData.budget} budget per person, give me a hotel option list with HotelName, Hotel address, Price, Hotel url, geo coordinates, rating, description and suggest itinerary with placeName, Place details, Place image url, geo coordinates , ticket pricing, rating, time travel each of the location for ${formData.noOfDays} with each day plan with best time to visit in JSON format. Please provide me the URLs of images that are working.`;
+      const AI_PROMPT = `You are a travel assistant. Generate a detailed travel plan based on the following user inputs:
+•⁠  ⁠Destination: ${formData.location.label}
+•⁠  ⁠Start Date: ${formData.inDate}.
+•⁠  End Date: ${formData.outDate}.
+•⁠  ⁠Number of Days: ${formData.noOfDays}.
+•⁠  ⁠Approximate Budget: ${formData.budget}, this is the budget of my whole trip, so give data accordingly
+•⁠  ⁠Additional Details: ${formData.description}
+•⁠  ⁠Additional type of trip: ${formData.typeOftrip}
+•  Provide names of nearby popular shops, stalls for street food and shopping for each place that you will suggest the user.
+•  Also provide name of nearby public transportation accessibility points to the places that you will suggest the user.
+Output Details:
+Generate the plan in JSON format, ensuring the following details are included:
+
+1.⁠ ⁠Trip Summary:
+
+⁠ tripTitle ⁠: A title summarizing the trip.
+
+⁠ duration ⁠: The exact duration of the trip (e.g., "4 Days").
+
+⁠ travelers ⁠: Number of travelers.
+
+⁠ budget ⁠: Total budget in INR.
+
+⁠ currency ⁠: "INR".
+
+2.⁠ ⁠Hotel Options:
+Provide a list (atleast 5) of hotels, which are under my budget with the following details for each:
+
+⁠ hotelName ⁠: Name of the hotel.
+
+⁠ hotelAddress ⁠: Full address.
+
+⁠ price ⁠: Approximate price per night in INR.
+
+⁠ hotelUrl ⁠: A functional URL for booking or hotel details.
+
+⁠ geoCoordinates ⁠: Latitude and longitude of the hotel.
+
+⁠ rating ⁠: User rating out of 5.
+
+⁠ description ⁠: A brief description of the hotel, highlighting features or recommendations.
+
+3.⁠ ⁠Itinerary:
+Generate a day-wise plan starting from the given start date for the specified number of days. Include:
+
+⁠ date ⁠: The date for each day (in DD-MM-YYYY format).
+
+⁠ theme ⁠: The main theme or focus of the day (e.g., cultural exploration, shopping, relaxation).
+
+⁠ bestTimeToVisit ⁠: The ideal time to visit the planned attractions.
+
+⁠ activities ⁠: A list of places with the following details:
+
+⁠ placeName ⁠: Name of the place.
+
+⁠ placeDetails ⁠: A short description of the attraction.
+
+⁠ placeImageUrl ⁠: URL to an image of the place (ensure it’s working).
+
+⁠ geoCoordinates ⁠: Latitude and longitude.
+
+⁠ ticketPricing ⁠: Approximate ticket pricing in INR.
+
+⁠ rating ⁠: User rating out of 5.
+
+⁠ timeTravel ⁠: Approximate travel time to reach the destination from the hotel or city center.
+
+4.⁠ ⁠Estimated Cost Breakdown:
+Provide an approximate breakdown of the total cost in the following categories:
+
+Accommodation (min and max) in INR.
+
+Sightseeing (min and max) in INR.
+
+Food (min and max) in INR.
+
+Transport (min and max) in INR.
+
+5.⁠ ⁠Additional Notes:
+
+Ensure all dates match the given start date and follow sequentially.
+
+Provide URLs of images that are functional.
+
+Format all output data in JSON format.`;
 
       try {
         setLoading(true);
         const result = await chatSession.sendMessage(AI_PROMPT);
+        console.log(result.response.candidates[0].content.parts[0].text);
         await saveTripDetail(
           result.response.candidates[0].content.parts[0].text,
           user
@@ -125,8 +223,8 @@ function CreateTrip() {
       tripChoices: formData,
       tripData: JSON.parse(tripDetail),
       user: JSON.parse(localStorage.getItem("user")),
-      invitedUsersName : names,
-      invitedUsersEmail : emails
+      invitedUsersName: names,
+      invitedUsersEmail: emails,
     });
     navigate(`/view-trip/${docId}`);
     axios.post("http://localhost:5001/send-mail", {
@@ -151,7 +249,7 @@ function CreateTrip() {
         border.badges === item.type ? "border-black" : ""
       }`}
       onClick={() => {
-        handleInputChange("typeOfBudget", item.type);
+        // handleInputChange("typeOfBudget", item.type);
         setBorder((border) => ({ ...border, badges: item.type }));
       }}
     >
@@ -259,7 +357,12 @@ function CreateTrip() {
           </div>
 
           <div>
-              <DatePickerValue inDate={inDate} outDate={outDate} setInDate={setInDate} setOutDate={setOutDate}/>
+            <DatePickerValue
+              inDate={inDate}
+              outDate={outDate}
+              setInDate={setInDate}
+              setOutDate={setOutDate}
+            />
           </div>
 
           <div className="space-y-2">
@@ -267,9 +370,9 @@ function CreateTrip() {
               How many days are you planning your trip for?
             </h2>
             <input
-            disabled
+              disabled
               className="w-full border rounded-lg p-3 text-base"
-              value={Math.floor(outDate.diff(inDate)/millisecondsInOneDay)}
+              value={Math.floor(outDate.diff(inDate) / millisecondsInOneDay)}
               type="number"
               placeholder="Ex: 9"
               onChange={(e) => handleInputChange("noOfDays", e.target.value)}
