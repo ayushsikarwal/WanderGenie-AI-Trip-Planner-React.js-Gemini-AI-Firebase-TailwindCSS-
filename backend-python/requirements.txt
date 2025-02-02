@@ -1,0 +1,13 @@
+Flask
+matplotlib
+google-cloud-texttospeech
+google-cloud
+groq
+google-generativeai
+google-cloud-translate
+gradio
+pinecone
+pydub
+rapidfuzz
+langchain
+langchain_google_genai
