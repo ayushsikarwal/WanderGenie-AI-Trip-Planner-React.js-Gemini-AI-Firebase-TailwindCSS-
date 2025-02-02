@@ -54,10 +54,10 @@ const InfoSection = ({ trip, tripId }) => {
             💰 {trip?.tripChoices?.budget}
           </h2>
         </div>
-        <div>
+        {/* <div>
           <Button onClick ={()=>{navigate(`/chat-room/${tripId}`)}} className="rounded"> 🛫 Chatting Area</Button>
           <Button onClick ={()=>{navigate(`/budgeting-tool/${tripId}`)}} className="rounded"> 🛫 Budget Tracking trip</Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

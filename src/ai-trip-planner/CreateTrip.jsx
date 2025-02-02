@@ -120,6 +120,7 @@ function CreateTrip() {
 •⁠  ⁠Additional type of trip: ${formData.typeOftrip}
 •  Provide names of nearby popular shops, stalls for street food and shopping for each place that you will suggest the user.
 •  Also provide name of nearby public transportation accessibility points to the places that you will suggest the user.
+•  Also provide me timestamp to visit or best time to do that activity by providing the optimal time (optimalVisitTime:"11:30 AM to 2:30 PM"  in this form) to visit and leaving the place. Do this for each and very palce that you suggest.
 Output Details:
 Generate the plan in JSON format, ensuring the following details are included:
 

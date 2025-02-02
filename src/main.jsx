@@ -13,7 +13,13 @@ import Footer from "./components/ui/custom/Footer.jsx";
 import ChatRoom from "./chattingroom/ChatRoom.jsx";
 import BudgetingTool from "./budgetingtool/BudgetingTool.jsx";
 import NewBudgetingTool from "./budgetingtool/NewBudgetingTool.jsx";
-
+import Hotels from "./viewTrip/components/Hotes.jsx";
+import BookingMain from "./booking/BookingMain.jsx" 
+import HotelBooking from "./booking/HotelBooking.jsx";
+import FlightBooking from "./booking/FlightBooking.jsx";
+import SightSeeing from "./booking/SightSeeing.jsx";
+import ViewDetailOfHotel from "./booking/ViewDetailOfHotel.jsx";
+import Schedule from "./schedule/Schedule.jsx";
 function Root() {
 
   // if (!data) return <div>Loading...</div>;
@@ -36,6 +42,10 @@ function Root() {
       element: <Mytrips />,
     },
     {
+      path: "/my-schedule/:tripId",
+      element: <Schedule />,
+    },
+    {
       path: "/chat-room/:tripId",
       element: <ChatRoom />,
     },
@@ -43,6 +53,24 @@ function Root() {
       path: "/budgeting-tool/:tripId",
       element: (
         <NewBudgetingTool/>
+      ),
+    },
+    {
+      path: "/booking/:tripId",
+      element: (
+        <BookingMain/>
+      ),
+    },
+    {
+      path: "/booking/hotels/:hotelId",
+      element: (
+        <ViewDetailOfHotel />
+      ),
+    },
+    {
+      path: "/booking/flight/:tripId",
+      element: (
+        <FlightBooking/>
       ),
     },
   ]);

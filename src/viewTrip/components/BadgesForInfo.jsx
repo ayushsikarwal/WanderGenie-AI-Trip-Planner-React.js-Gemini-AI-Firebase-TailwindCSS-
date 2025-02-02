@@ -8,30 +8,36 @@ const BadgesForInfo = ({ tripDetails }) => {
   }
 
   return (
-    <div>
-      <div className="flex justify-between">
-        <p className="font-semibold">
-          Theme:{" "}
-          <span className="text-gray-500 text-sm">{tripDetails?.theme || "N/A"}</span>
-        </p>
-        <p className="font-semibold">
-          Best Time to Visit:{" "}
-          <span className="text-gray-500 text-sm">
-            {tripDetails?.bestTimeToVisit || "N/A"}
-          </span>
-        </p>
+    <div className="bg-white p-6 shadow-lg rounded-lg">
+  {/* Info Row */}
+  <div className="flex flex-col md:flex-row md:justify-between gap-4 border-b border-gray-300 pb-3">
+    <p className="font-bold text-lg text-gray-800">
+      📌 Date to Visit:{" "}
+      <span className="text-gray-500 text-sm">{tripDetails?.date || "N/A"}</span>
+    </p>
+    <p className="font-semibold text-gray-700">
+      🎭 Theme:{" "}
+      <span className="text-gray-500 text-sm">{tripDetails?.theme || "N/A"}</span>
+    </p>
+    <p className="font-semibold text-gray-700">
+      🌅 Best Time to Visit:{" "}
+      <span className="text-gray-500 text-sm">{tripDetails?.bestTimeToVisit || "N/A"}</span>
+    </p>
+  </div>
+
+  {/* Activities Grid */}
+  <div className="w-full grid grid-cols-1 gap-5 mt-4">
+    {tripDetails.activities.map((activity, index) => (
+      <div
+        key={index}
+        className="border border-gray-300 rounded-xl hover:scale-105 transition-all w-full bg-white shadow-md p-4"
+      >
+        <Badgesub it={activity} />
       </div>
-      <div className="grid md:grid-cols-2 gap-5 sm:grid-cols-1">
-        {tripDetails.activities.map((activity, index) => (
-          <div
-            key={index}
-            className="m-2 border-2 border-gray-300 rounded-xl hover:scale-105 transition-all max-w-xs sm:max-w-sm"
-          >
-            <Badgesub it={activity} />
-          </div>
-        ))}
-      </div>
-    </div>
+    ))}
+  </div>
+</div>
+
   );
 };
 

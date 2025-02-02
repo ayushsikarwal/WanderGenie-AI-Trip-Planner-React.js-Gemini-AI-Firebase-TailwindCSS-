@@ -38,7 +38,7 @@ const ViewTrip = () => {
       <InfoSection trip={trip} tripId ={tripId}/>
       <Hotes trip={trip}/>
       <PlacesToVisit trip = {trip}/>
-      <FloatingNavBar/>
+      <FloatingNavBar tripId={tripId}/>
       <div>Trip ID: {tripId}</div>
     </div>
     </>

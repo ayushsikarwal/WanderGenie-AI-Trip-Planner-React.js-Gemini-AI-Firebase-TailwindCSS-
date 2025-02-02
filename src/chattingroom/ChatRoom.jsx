@@ -1,4 +1,8 @@
+import FloatingNavBar from "@/components/ui/custom/FloatingNavBar";
+import { db } from "@/services/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:5001");
@@ -18,12 +22,12 @@ const getInitials = (name) => {
 
 const getRandomColor = () => {
   const colors = [
-    "#4F46E5",
-    "#059669",
-    "#B45309",
-    "#7C3AED",
-    "#BE185D",
-    "#1D4ED8",
+    "#FF6B6B", // Light red
+    "#FF8787", // Softer red
+    "#FA5252", // Bright red
+    "#FF4D4D", // Vibrant red
+    "#FF7676", // Pink-red
+    "#FF5C5C", // Coral red
   ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
@@ -42,10 +46,30 @@ const ChatRoom = () => {
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const fileInputRef = useRef(null);
+  const { tripId } = useParams();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const [trip, setTrip] = useState(null); // State for trip data
+  
+    // Fetch the trip data
+    useEffect(() => {
+      fetchTripData();
+    }, [tripId]); 
+  
+    const fetchTripData = async () => {
+      if (!tripId) return;
+  
+      const docRef = doc(db, "AITrip", tripId); // Reference to Firestore document
+      const snapDoc = await getDoc(docRef); // Fetch the document
+  
+      if (snapDoc.exists()) {
+        setTrip(snapDoc.data()); // Set fetched data to state
+        console.log(snapDoc.data())
+      }
+    };
 
   useEffect(() => {
     socket.on("receive-message", (data) => {
@@ -213,18 +237,18 @@ const ChatRoom = () => {
         <img
           src={fileData.data}
           alt="shared"
-          style={{ maxWidth: "200px", maxHeight: "200px", borderRadius: "4px" }}
+          className="max-w-[200px] max-h-[200px] rounded-lg"
         />
       );
     }
 
     return (
-      <div className="file-attachment">
+      <div className="bg-gray-50 p-2 rounded-lg mt-2 flex items-center justify-between">
         <span>📎 {fileData.name}</span>
         <a
           href={fileData.data}
           download={fileData.name}
-          className="download-link"
+          className="text-red-400 hover:text-red-500 text-sm px-2 py-1 bg-gray-100 rounded-md"
         >
           Download
         </a>
@@ -233,490 +257,187 @@ const ChatRoom = () => {
   };
 
   return (
-    <div className="app-container">
+    <div className="min-h-screen bg-gradient-to-br from-red-100 to-white p-4 font-sans">
       {!joined ? (
-        <div className="login-container">
-          <div className="login-card">
-            <h1>Join the Chat</h1>
-            <div className="login-input-group">
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+              Join the Chat
+            </h1>
+            <div className="flex gap-2">
               <input
                 type="text"
                 placeholder="Enter your username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && joinCommunity()}
+                className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-red-300"
               />
-              <button onClick={joinCommunity}>Join</button>
+              <button
+                onClick={joinCommunity}
+                className="px-6 py-2 bg-red-400 hover:bg-red-500 text-white rounded-lg transition-colors"
+              >
+                Join
+              </button>
             </div>
           </div>
         </div>
       ) : (
-        <div className="chat-container">
-          <div className="chat-main">
-            <div className="chat-messages">
-              <h2>Community Chat</h2>
-              <div className="messages-list">
-                {messages.map((msg, index) => (
-                  <div key={index} className="message-item">
-                    {msg.replyTo && (
-                      <div className="reply-content">
-                        <span className="reply-username">
-                          {msg.replyTo.username}
-                        </span>
-                        <span className="reply-text">
-                          {msg.replyTo.message}
-                        </span>
-                      </div>
-                    )}
-                    <div className="message-content">
+        <div className="max-w-6xl mx-auto grid pb-[80px] grid-cols-1 lg:grid-cols-4 gap-4 h-[calc(100vh-2rem)]">
+          <div className="lg:col-span-3 bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="flex flex-col h-full">
+              <div className="flex flex-col h-full">
+                <h2 className="p-4 text-xl font-semibold text-gray-800 border-b border-gray-100">
+                  Group Chat
+                </h2>
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {messages.map((msg, index) => {
+                    const isSender = msg.username === username; // Check if the message is from the current user
+                    return (
                       <div
-                        className="avatar"
-                        style={{ backgroundColor: msg.userColor }}
+                        key={index}
+                        className={`flex ${
+                          isSender ? "justify-end" : "justify-start"
+                        }`}
                       >
-                        {getInitials(msg.username)}
-                      </div>
-                      <div className="message-body">
-                        <div className="message-header">
-                          <span className="username">{msg.username}</span>
-                          <span className="timestamp">
-                            {msg.timestamp && formatTime(msg.timestamp)}
-                          </span>
-                        </div>
-                        {msg.message && <p>{msg.message}</p>}
-                        {msg.file && renderFilePreview(msg.file)}
-                        <button
-                          className="reply-button"
-                          onClick={() => setReplyTo(msg)}
+                        <div
+                          className={`max-w-[75%] p-3 rounded-lg shadow ${
+                            isSender
+                              ? "bg-red-400 text-white"
+                              : "bg-gray-100 text-gray-800"
+                          } flex flex-col`}
                         >
-                          Reply
-                        </button>
+                          <div className="flex items-center gap-2 mb-1">
+                            {!isSender && (
+                              <span className="font-semibold">
+                                {msg.username}
+                              </span>
+                            )}
+                            <span className="text-sm text-gray-500">
+                              {msg.timestamp && formatTime(msg.timestamp)}
+                            </span>
+                          </div>
+                          {msg.message && <p>{msg.message}</p>}
+                          {msg.file && renderFilePreview(msg.file)}
+                          {!isSender && (
+                            <button
+                              onClick={() => setReplyTo(msg)}
+                              className="mt-2 text-sm text-red-500 hover:text-red-600"
+                            >
+                              Reply
+                            </button>
+                          )}
+                        </div>
                       </div>
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
+                  {isTyping.length > 0 && (
+                    <div className="text-sm text-gray-500 italic">
+                      {isTyping.join(", ")}{" "}
+                      {isTyping.length === 1 ? "is" : "are"} typing...
                     </div>
+                  )}
+                </div>
+              </div>
+
+              {replyTo && (
+                <div className="bg-gray-50 px-4 py-2 flex justify-between items-center border-t border-gray-100">
+                  <div className="text-sm text-gray-600">
+                    <span>Replying to </span>
+                    <strong className="text-gray-800">
+                      {replyTo.username}
+                    </strong>
                   </div>
-                ))}
-                <div ref={messagesEndRef} />
-                {isTyping.length > 0 && (
-                  <div className="typing-indicator">
-                    {isTyping.join(", ")} {isTyping.length === 1 ? "is" : "are"}{" "}
-                    typing...
+                  <button
+                    onClick={() => setReplyTo(null)}
+                    className="text-gray-400 hover:text-gray-600 text-xl"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              <div className="p-4 border-t border-gray-100">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Type a message"
+                    value={message}
+                    onChange={(e) => {
+                      setMessage(e.target.value);
+                      handleTyping();
+                    }}
+                    onKeyPress={handleKeyPress}
+                    className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-red-300"
+                  />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    accept="image/*,.pdf,.doc,.docx,.txt"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-4 py-2 text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg"
+                  >
+                    📎
+                  </button>
+                  <button
+                    onClick={sendMessage}
+                    className="px-6 py-2 bg-red-400 hover:bg-red-500 text-white rounded-lg transition-colors"
+                  >
+                    Send
+                  </button>
+                </div>
+                {previewUrl && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
+                    <button
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setPreviewUrl("");
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = "";
+                        }
+                      }}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      ×
+                    </button>
                   </div>
                 )}
               </div>
-              {replyTo && (
-                <div className="reply-bar">
-                  <div className="reply-info">
-                    <span>Replying to </span>
-                    <strong>{replyTo.username}</strong>
-                  </div>
-                  <button
-                    className="cancel-reply"
-                    onClick={() => setReplyTo(null)}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-              <div className="input-container">
-                <input
-                  type="text"
-                  placeholder="Type a message"
-                  value={message}
-                  onChange={(e) => {
-                    setMessage(e.target.value);
-                    handleTyping();
-                  }}
-                  onKeyPress={handleKeyPress}
-                />
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileSelect}
-                  style={{ display: "none" }}
-                  accept="image/*,.pdf,.doc,.docx,.txt"
-                />
-                <button
-                  className="attach-button"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  📎
-                </button>
-                <button onClick={sendMessage}>Send</button>
-              </div>
-              {previewUrl && (
-                <div className="preview-container">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="file-preview"
-                  />
-                  <button
-                    className="cancel-upload"
-                    onClick={() => {
-                      setSelectedFile(null);
-                      setPreviewUrl("");
-                      if (fileInputRef.current) {
-                        fileInputRef.current.value = "";
-                      }
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
             </div>
           </div>
-          <div className="users-sidebar">
-            <h3>Online Users ({users.length})</h3>
-            <div className="users-list">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Online Users ({users.length})
+            </h3>
+            <div className="space-y-2">
               {users.map((user, index) => (
-                <div key={index} className="user-item">
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                >
                   <div
-                    className="avatar"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm"
                     style={{ backgroundColor: user.color }}
                   >
                     {getInitials(user.username)}
                   </div>
-                  <span>{user.username}</span>
+                  <span className="text-gray-700">{user.username}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
       )}
-      <style>{`
-        /* Previous styles remain the same */
-        * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.app-container {
-  min-height: 100vh;
-  background: linear-gradient(to bottom right, #1a1a1a, #2d2d2d);
-  padding: 1rem;
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.login-card {
-  background: #2d2d2d;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
-.login-card h1 {
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-size: 1.5rem;
-}
-
-.login-input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.chat-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 1rem;
-  height: calc(100vh - 2rem);
-}
-
-.chat-main {
-  background: #2d2d2d;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.chat-messages {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.chat-messages h2 {
-  padding: 1rem;
-  margin: 0;
-  border-bottom: 1px solid #404040;
-}
-
-.messages-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-}
-
-.message-item {
-  margin-bottom: 1rem;
-}
-
-.reply-content {
-  margin-left: 2.5rem;
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
-  background: #404040;
-  border-left: 3px solid #666;
-  border-radius: 4px;
-  font-size: 0.875rem;
-}
-
-.reply-username {
-  font-weight: 600;
-  margin-right: 0.5rem;
-}
-
-.message-content {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.message-body {
-  flex: 1;
-}
-
-.message-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.username {
-  font-weight: 600;
-}
-
-.timestamp {
-  color: #999;
-  font-size: 0.875rem;
-}
-
-.reply-button {
-  background: none;
-  border: none;
-  color: #666;
-  padding: 0.25rem 0;
-  cursor: pointer;
-  font-size: 0.875rem;
-}
-
-.reply-button:hover {
-  color: #fff;
-}
-
-.typing-indicator {
-  color: #999;
-  font-style: italic;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-}
-
-.reply-bar {
-  background: #404040;
-  padding: 0.75rem 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.reply-info {
-  font-size: 0.875rem;
-  color: #999;
-}
-
-.cancel-reply {
-  background: none;
-  border: none;
-  color: #999;
-  font-size: 1.25rem;
-  cursor: pointer;
-  padding: 0.25rem;
-}
-
-.cancel-reply:hover {
-  color: #fff;
-}
-
-.input-container {
-  padding: 1rem;
-  border-top: 1px solid #404040;
-  display: flex;
-  gap: 0.5rem;
-}
-
-input {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #404040;
-  border-radius: 4px;
-  background: #333;
-  color: #fff;
-  font-size: 0.875rem;
-}
-
-input:focus {
-  outline: none;
-  border-color: #666;
-}
-
-button {
-  padding: 0.75rem 1.5rem;
-  background: #2563eb;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-button:hover {
-  background: #1d4ed8;
-}
-
-.users-sidebar {
-  background: #2d2d2d;
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-.users-sidebar h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
-}
-
-.users-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.user-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-}
-
-.user-item:hover {
-  background: #404040;
-}
-
-@media (max-width: 768px) {
-  .chat-container {
-    grid-template-columns: 1fr;
-  }
-
-  .users-sidebar {
-    display: none;
-  }
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1a1a1a;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #404040;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #4a4a4a;
-}
-        
-        .file-attachment {
-          background: #404040;
-          padding: 0.5rem;
-          border-radius: 4px;
-          margin-top: 0.5rem;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .download-link {
-          color: #2563eb;
-          text-decoration: none;
-          font-size: 0.875rem;
-          padding: 0.25rem 0.5rem;
-          background: #333;
-          border-radius: 4px;
-        }
-
-        .download-link:hover {
-          background: #404040;
-        }
-
-        .attach-button {
-          padding: 0.75rem;
-          background: none;
-          border: 1px solid #404040;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: background-color 0.2s;
-        }
-
-        .attach-button:hover {
-          background: #404040;
-        }
-
-        .preview-container {
-          padding: 0.5rem;
-          border-top: 1px solid #404040;
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        .file-preview {
-          max-width: 100px;
-          max-height: 100px;
-          border-radius: 4px;
-        }
-
-        .cancel-upload {
-          background: none;
-          border: none;
-          color: #999;
-          font-size: 1.25rem;
-          cursor: pointer;
-          padding: 0.25rem;
-        }
-
-        .cancel-upload:hover {
-          color: #fff;
-        }
-      `}</style>
+      <FloatingNavBar tripId={tripId} />
     </div>
   );
 };

@@ -67,7 +67,7 @@ function Header() {
 
   return (
     <div className="p-3 flex items-center px-5 justify-between shadow-md">
-      <img src="/logo.svg" alt="Logo" />
+      <img className="h-14" src="/logo2.png" alt="Logo" />
 
       <Dialog open={signUp}>
         <DialogContent>

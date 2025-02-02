@@ -1,3 +1,6 @@
+// egfiwygeifwbeonwubeivcn
+
+import FloatingNavBar from "@/components/ui/custom/FloatingNavBar";
 import Header from "@/components/ui/custom/Header";
 import { db } from "@/services/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
@@ -27,7 +30,11 @@ const NewBudgetingTool = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [trip, setTrip] = useState(null);
 
-  const { tripId } = useParams();
+  const { tripId } = useParams();  // Ensure this is correctly defined
+if (!tripId) {
+  console.error("Trip ID is missing!");
+  return;
+}
 
   // Use a ref to hold the MediaRecorder instance
   const mediaRecorderRef = useRef(null);
@@ -54,14 +61,17 @@ const NewBudgetingTool = () => {
   // Separate effect for API call
   useEffect(() => {
     if (!trip) return;
+    const payload = {
+     tripInvitedUser: trip?.invitedUsersName || [],
+     tripOrganiser: trip?.user?.given_name || "",
+     tripId: tripId,
+    };
 
+    console.log("Sending Payload:", payload);  // Debug log
     fetch("http://127.0.0.1:5000/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        tripInvitedUser: trip?.invitedUsersName || [],
-        tripOrganiser: trip?.user?.given_name || "",
-      }),
+      body: JSON.stringify(payload),
     })
       .then((response) => response.json())
       .then((responseData) => {
@@ -109,6 +119,7 @@ const NewBudgetingTool = () => {
         });
         const formData = new FormData();
         formData.append("audio", audioBlob);
+        formData.append("trip_id", tripId)
 
         setIsLoading(true);
         setStatus("Uploading audio...");
@@ -132,8 +143,8 @@ const NewBudgetingTool = () => {
             };
 
             // Save the charts to localStorage
-            localStorage.setItem("contributionChart", newData.contributionChart);
-            localStorage.setItem("dueChart", newData.dueChart);
+            // localStorage.setItem("contributionChart", newData.contributionChart);
+            // localStorage.setItem("dueChart", newData.dueChart);
 
             return newData;
           });
@@ -261,7 +272,7 @@ const handleSearch = async () => {
                   </h2>
                   {data.contributionChart ? (
                     <img
-                      src={`data:image/png;base64,${localStorage.getItem("contributionChart")}`}
+                      src={`data:image/png;base64,${data.contributionChart}`}
                       alt="Individual Contribution Chart"
                       className="w-full h-auto rounded-xl shadow-sm"
                     />
@@ -279,7 +290,7 @@ const handleSearch = async () => {
                   </h2>
                   {data.dueChart ? (
                     <img
-                      src={`data:image/png;base64,${localStorage.getItem("dueChart")}`}
+                      src={`data:image/png;base64,${data.dueChart}`}
                       alt="Due Amounts Chart"
                       className="w-full h-auto rounded-xl shadow-sm"
                     />
@@ -386,6 +397,7 @@ const handleSearch = async () => {
           )}
         </div>
       </div>
+      <FloatingNavBar tripId ={tripId}/>
     </>
   );
 };

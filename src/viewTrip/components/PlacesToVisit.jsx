@@ -11,20 +11,25 @@ const PlacesToVisit = ({ trip }) => {
   }
 
   return (
-    <div>
-      <h2 className="font-bold text-lg">Places to Visit</h2>
-
-      <div>
-        {Object.entries(itinerary)
-          .sort(([dayA], [dayB]) => dayA.localeCompare(dayB)) // Sort keys in ascending order
-          .map(([day, details]) => (
-            <div key={day}>
-              <h2 className="font-medium text-lg"> {day.toUpperCase()}</h2>
-              <BadgesForInfo tripDetails = {details}/>
-            </div>
-          ))}
-      </div>
+    <div className="bg-gray-50 p-6 rounded-xl shadow-md">
+    <h2 className="font-bold text-2xl text-gray-800 border-b-2 border-gray-300 pb-2">
+      🏞️ Places to Visit
+    </h2>
+  
+    <div className="mt-4 space-y-6">
+      {Object.entries(itinerary)
+        .sort(([dayA], [dayB]) => dayA.localeCompare(dayB)) // Sort days alphabetically
+        .map(([day, details]) => (
+          <div key={day} className="bg-white p-4 shadow-md rounded-lg">
+            <h3 className="font-extrabold text-xl text-red-500 mb-2">
+              📅 {day.toUpperCase()}
+            </h3>
+            <BadgesForInfo tripDetails={details} />
+          </div>
+        ))}
     </div>
+  </div>
+  
   );
 };
 

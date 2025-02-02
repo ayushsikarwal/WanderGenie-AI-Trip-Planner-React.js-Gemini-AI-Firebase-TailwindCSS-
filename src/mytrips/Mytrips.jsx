@@ -5,9 +5,13 @@ import React, { useEffect, useState } from "react";
 import CardOfSavedTrips from "./components/CardOfSavedTrips";
 
 const Mytrips = () => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const [user,setuser]= useState('')
     const [userTrip, setUserTrip] = useState([]);
-  
+
+    useEffect(()=>{
+      let userInstorage = JSON.parse(localStorage.getItem("user"));
+      setuser(userInstorage)
+    },[])
     useEffect(() => {
       if (user) {
         getUserInfo();
@@ -35,7 +39,7 @@ const Mytrips = () => {
         <div className="px-4 sm:px-6 md:px-12 lg:px-44 py-8 sm:py-12 md:py-20">
           <h2 className="font-extrabold text-2xl sm:text-[30px] mb-6">My trips</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {userTrip.map((trip) => (
+            {userTrip && userTrip.length>0 &&  userTrip.map((trip) => (
               <CardOfSavedTrips key={trip.id} trip={trip} />
             ))}
           </div>

@@ -8,13 +8,13 @@ import { getAnalytics } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyD8pqSscSLxAUUBoQF2R0giodKXcEIdOPE",
-  authDomain: "ai-trip-planner-c1982.firebaseapp.com",
-  projectId: "ai-trip-planner-c1982",
-  storageBucket: "ai-trip-planner-c1982.firebasestorage.app",
-  messagingSenderId: "538476014237",
-  appId: "1:538476014237:web:990fe8839258fca7bd8274",
-  measurementId: "G-SP5PM1BCDD"
+  apiKey: "AIzaSyBr10mnWK_9TaMX_Y15QrMj5NX0ue0NONo",
+  authDomain: "ai-trip-2-77f35.firebaseapp.com",
+  projectId: "ai-trip-2-77f35",
+  storageBucket: "ai-trip-2-77f35.firebasestorage.app",
+  messagingSenderId: "1018946780177",
+  appId: "1:1018946780177:web:c691db935e8a23eaa005b0",
+  measurementId: "G-SPT3NJ8ZX2"
 };
 
 // Initialize Firebase
