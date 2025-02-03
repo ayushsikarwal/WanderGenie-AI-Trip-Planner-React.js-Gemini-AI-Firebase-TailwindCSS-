@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Hotelbadges from './Hotelbadges.jsx';
 
 const Hotels = ({ trip }) => {
-  // Check if trip and tripData are valid
+
   if (!trip || !trip.tripData || !trip.tripData.hotelOptions) {
     return <div>Loading or No Hotels Available</div>;  // Handle the case where data is not available
   }

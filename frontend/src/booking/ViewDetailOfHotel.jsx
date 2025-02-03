@@ -28,14 +28,14 @@ const AttractionItem = ({ name, distance }) => (
   const parseAttractions = (attractionsHtml) => {
     if (!attractionsHtml) return { attractions: [], airports: [] };
     
-    // Extract the content between <p> tags
+
     const matches = attractionsHtml.match(/<p>(.*?)<\/p>/g);
     if (!matches) return { attractions: [], airports: [] };
   
     const attractionsText = matches[0].replace(/<\/?p>/g, '');
     const airportsText = matches[1]?.replace(/<\/?p>/g, '');
   
-    // Parse attractions
+
     const attractions = attractionsText
       .split('<br />')
       .filter(item => item.trim())
@@ -44,7 +44,7 @@ const AttractionItem = ({ name, distance }) => (
         return { name, distance };
       });
   
-    // Parse airports
+
     const airports = airportsText
       ?.split('<br />')
       .filter(item => item.trim())
@@ -92,14 +92,14 @@ const ViewDetailOfHotel = () => {
     );
   };
 
-  // Function to create rating stars
+
   const renderStars = (rating) => {
     return [...Array(rating)].map((_, index) => (
       <Star key={index} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
     ));
   };
 
-  // Function to parse the description HTML
+
   const createMarkup = (htmlContent) => {
     return { __html: htmlContent };
   };
@@ -108,7 +108,6 @@ const ViewDetailOfHotel = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 bg-orange-50">
-      {/* Hotel Name and Rating Section */}
       <div className="mb-8 bg-white rounded-xl p-6 shadow-lg">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -127,7 +126,7 @@ const ViewDetailOfHotel = () => {
         </div>
       </div>
 
-      {/* Image Gallery */}
+
       <div className="relative h-[32rem] mb-8 rounded-xl overflow-hidden shadow-xl">
         <img
           src={hotel.Images[currentImageIndex]}
@@ -153,7 +152,7 @@ const ViewDetailOfHotel = () => {
         </div>
       </div>
 
-      {/* Hotel Information Grid */}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         {/* Key Information */}
         <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">

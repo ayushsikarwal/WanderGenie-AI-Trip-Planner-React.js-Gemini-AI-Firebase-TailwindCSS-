@@ -27,50 +27,68 @@ const BookingPortal = () => {
         setError(null); // Clear any previous errors
         setLoading(true); // Start loading
 
+     const data =   {
+            ClientId: import.meta.env.VITE_CLIENT_ID,
+            UserName: import.meta.env.VITE_USER_ID,
+            Password: import.meta.env.VITE_PASSWORD, 
+            EndUserIp: import.meta.env.VITE_ENDUSERIP
+        }
+
+        console.log("data", data)
+
+        const tokenId = await axios.post("http://Sharedapi.tektravels.com/SharedData.svc/rest/Authenticate", 
+          data
+        )
+
         const searchRequest = {
-            EndUserIp: "192.168.10.10", // Static from your requirements
-            TokenId: "ac2751e9-4cc3-406f-b678-c947e4f57a00", // Static from your requirements
+            EndUserIp: "10.145.17.30", // Static from your requirements
+            TokenId: tokenId.data.TokenId, // Static from your requirements
+            // TokenId: tokenId.data.TokenId, // Static from your requirements
             AdultCount: adultCount,
             ChildCount: childCount,
             InfantCount: infantCount,
-            DirectFlight: directFlight,
+            DirectFlight: directFlight? "true":"false",
             OneStopFlight: oneStopFlight,
-            JourneyType: journeyType,
+            JourneyType: "1",
             PreferredAirlines: null, // You can add logic for this if needed
             Segments: [
                 {
                     Origin: origin,
                     Destination: destination,
                     FlightCabinClass: flightCabinClass,
-                    PreferredDepartureTime: preferredDepartureTime,
-                    PreferredArrivalTime: preferredArrivalTime,
+                    PreferredDepartureTime: preferredDepartureTime+':00',
+                    // PreferredDepartureTime: "2025-2-04T00:00:00",
+                    PreferredArrivalTime: preferredArrivalTime+':00',
+                    // PreferredArrivalTime: "2025-2-05T00:00:00",
                 },
             ],
             Sources: null, // You can add logic for this if needed
         };
+        console.log("search request",searchRequest)
+        // {
+        //     EndUserIp: "10.145.17.30",
+        //     TokenId: "cf1e16fc-b9e7-41bd-b7f4-6a7e703ad6c6",
+        //     AdultCount: "1",
+        //     ChildCount: "1",
+        //     InfantCount: "1",
+        //     DirectFlight: "false",
+        //     OneStopFlight: "false",
+        //     JourneyType: "1",
+        //     PreferredAirlines: null,
+        //     Segments: [{
+        //         Origin: "JAI",
+        //         Destination: "CCU",
+        //         FlightCabinClass: "1",
+        //         PreferredDepartureTime: "2025-2-10T00:00:00",
+        //         PreferredArrivalTime: "2025-2-10T00:00:00"
+        //     }],
+        //     Sources: null
+        // }
 
         try {
             // Replace with your actual API endpoint
             // console.log("Sending search request:", JSON.stringify(searchReq, null, 2));
-            const response = await axios.post('http://localhost:5001/api/flight-search', {
-                EndUserIp: "10.145.17.30",
-                TokenId: "cf1e16fc-b9e7-41bd-b7f4-6a7e703ad6c6",
-                AdultCount: "1",
-                ChildCount: "1",
-                InfantCount: "1",
-                DirectFlight: "false",
-                OneStopFlight: "false",
-                JourneyType: "1",
-                PreferredAirlines: null,
-                Segments: [{
-                    Origin: "JAI",
-                    Destination: "CCU",
-                    FlightCabinClass: "1",
-                    PreferredDepartureTime: "2025-2-10T00:00:00",
-                    PreferredArrivalTime: "2025-2-10T00:00:00"
-                }],
-                Sources: null
-            }, {
+            const response = await axios.post('http://localhost:5001/api/flight-search', searchRequest, {
                 headers: {
                     'Content-Type': 'application/json',
                 }
@@ -89,16 +107,16 @@ const BookingPortal = () => {
             //     throw new Error(`HTTP error! status: ${response.status}`);
             // }
 
-            // const data = await response.json();
+
             const data = await response.data;
             setSearchResponse(data);
-            console.log("Search Response:", data); // Log the entire response to the console
+            console.log("Search Response:", data); 
         } catch (e) {
             setError(`Search failed: ${e.message}`);
             setSearchResponse(null);
-            console.error("Search Error:", e); // Log the error to the console
+            console.error("Search Error:", e); 
         } finally {
-            setLoading(false); // Stop loading, regardless of success or failure
+            setLoading(false); 
         }
     };
 
