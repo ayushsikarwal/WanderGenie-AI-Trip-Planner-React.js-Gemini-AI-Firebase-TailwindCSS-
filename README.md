@@ -1,5 +1,13 @@
 # TBO HACKATHON - AI Trip Planner 🌎
 
+![Image](https://github.com/user-attachments/assets/475e3e94-e743-448e-a2d7-1bce99b0aa31)
+![Image](https://github.com/user-attachments/assets/f8439543-e7d1-4e71-b7a4-853d0f8f4c9b)
+![Image](https://github.com/user-attachments/assets/96664aae-12cf-449e-b897-07ac4bb8119e)
+<img width="1440" alt="Image" src="https://github.com/user-attachments/assets/9dada6f4-9d23-4d1f-890d-d67b861d50ad" />
+<img width="1440" alt="Image" src="https://github.com/user-attachments/assets/c6dca974-26b2-49f9-9c76-47b57fa5fa8a" />
+<img width="1440" alt="Image" src="https://github.com/user-attachments/assets/b5496dea-515e-4793-8480-6b1c885ac600" />
+<img width="1440" alt="Image" src="https://github.com/user-attachments/assets/f977c900-32e2-4ead-86ba-8a8fe92010ec" />
+
 An intelligent travel planning platform that combines AI-powered itinerary generation with real-time collaboration features.
 
 ## 🚀 Features
